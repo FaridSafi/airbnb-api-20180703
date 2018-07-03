@@ -67,15 +67,15 @@ app.get("/api/room/:id", function(req, res) {
   });
 });
 
-app.get("/api/rooms", function(req, res) {
-  Room.find({ city: req.query.city }).exec(function(err, objs) {
-    const result = {
-      rooms: objs,
-      count: objs.length
-    };
-    res.json(result);
-  });
-});
+// app.get("/api/rooms", function(req, res) {
+//   Room.find({ city: req.query.city }).exec(function(err, objs) {
+//     const result = {
+//       rooms: objs,
+//       count: objs.length
+//     };
+//     res.json(result);
+//   });
+// });
 
 app.listen(3000, function() {
   console.log("Server started");
