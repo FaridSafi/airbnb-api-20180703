@@ -1,6 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const uid2 = require("uid2");
+const SHA256 = require("crypto-js/sha256");
+const encBase64 = require("crypto-js/enc-base64");
 
 const app = express();
 app.use(bodyParser.json());
@@ -67,15 +70,46 @@ app.get("/api/room/:id", function(req, res) {
   });
 });
 
-// app.get("/api/rooms", function(req, res) {
-//   Room.find({ city: req.query.city }).exec(function(err, objs) {
-//     const result = {
-//       rooms: objs,
-//       count: objs.length
-//     };
-//     res.json(result);
-//   });
-// });
+app.get("/api/rooms", function(req, res) {
+  Room.find({ city: req.query.city }).exec(function(err, objs) {
+    const result = {
+      rooms: objs,
+      count: objs.length
+    };
+    res.json(result);
+  });
+});
+
+app.post("/api/user/sign_up", function(req, res) {
+  const salt = uid2(64);
+  const token = uid2(64);
+
+  const user = new User({
+    account: {
+      username: req.body.username,
+      biography: req.body.biography
+    },
+    email: req.body.email,
+    token: token,
+    hash: SHA256(req.body.password + salt).toString(encBase64),
+    salt: salt
+  });
+
+  user.save(function(err) {
+    if (err) {
+      console.log(err);
+    }
+
+    res.json({
+      account: {
+        username: user.account.username,
+        biography: user.account.biography
+      },
+      _id: user._id,
+      token: user.token
+    });
+  });
+});
 
 app.listen(3000, function() {
   console.log("Server started");
